@@ -67,7 +67,33 @@ function _zsh_system_clipboard() {
 
 					typeset -g CLIPBOARD[set]="xclip -sel $clipboard_selection -in"
 					typeset -g CLIPBOARD[get]="xclip -sel $clipboard_selection -out"
-				} else {
+			freebsd*)
+				if (whence xclip 2>/dev/null) {
+						local clipboard_selection
+
+						case $ZSH_SYSTEM_CLIPBOARD_XCLIP_SELECTION {
+							PRIMARY)
+						clipboard_selection='PRIMARY'
+						;;
+
+						CLIPBOARD)
+							clipboard_selection='CLIPBOARD'
+							;;
+
+						*)
+							if [[ $ZSH_SYSTEM_CLIPBOARD_XCLIP_SELECTION != '' ]] {
+								error "\033[01m$ZSH_SYSTEM_CLIPBOARD_XCLIP_SELECTION\033[0m is not a valid value for \$ZSH_SYSTEM_CLIPBOARD_XCLIP_SELECTION. Please assign either 'PRIMARY' or 'CLIPBOARD'."
+
+							} else {
+								clipboard_selection='CLIPBOARD'
+							}
+							;;
+					}
+
+					typeset -g CLIPBOARD[set]="xclip -sel $clipboard_selection -in"
+					typeset -g CLIPBOARD[get]="xclip -sel $clipboard_selection -out"
+
+			} else {
 					suggest_to_install 'xclip'
 				}
 				;;
